@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>O Grau Perdido</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}
+#wrap{position:relative;}
+canvas{display:block;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  background:radial-gradient(ellipse at 50% 38%,#1c140a 0%,#080510 60%,#000 100%);
+  color:#d4a843;text-align:center;z-index:20;pointer-events:all;}
+.screen.hidden{display:none;}
+.st{font-size:3.4rem;font-weight:bold;letter-spacing:.1em;color:#f2d468;
+  text-shadow:0 0 40px rgba(242,200,60,.8),0 0 100px rgba(180,110,0,.4);margin-bottom:.15em;
+  font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;}
+.ss{font-size:.8rem;letter-spacing:.5em;color:#6a5020;text-transform:uppercase;margin-bottom:1.8em;
+  font-family:Georgia,serif;}
+.sd{width:260px;height:1px;background:linear-gradient(90deg,transparent,#d4a843,transparent);margin:.9em auto;}
+.stx{font-size:.88rem;color:#9a7840;line-height:2.1;max-width:520px;margin-bottom:.6em;font-family:Georgia,serif;}
+.sq{font-style:italic;color:#5a4020;font-size:.82rem;margin:.7em 0;font-family:Georgia,serif;}
+.btn{background:transparent;border:1px solid #c49830;color:#c49830;font-family:Georgia,serif;
+  font-size:.88rem;letter-spacing:.2em;padding:.65em 2.2em;cursor:pointer;margin:.3em;transition:all .22s;text-transform:uppercase;}
+.btn:hover{background:rgba(212,168,67,.18);box-shadow:0 0 25px rgba(212,168,67,.4);color:#f2d468;}
+.btnp{border-color:#f2d468;color:#f2d468;font-size:.98rem;padding:.82em 2.7em;}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:.3em 2.2em;text-align:left;font-size:.8rem;color:#7a6030;margin:.9em 0;font-family:Georgia,serif;}
+.ig span{color:#f2d468;}
+</style>
+</head>
+<body>
+<div id="wrap">
+<canvas id="c"></canvas>
+<div style="position:absolute;inset:0;pointer-events:none;" id="ui">
+
+<div class="screen" id="sT">
+  <div style="font-size:2rem;color:#3a2c10;letter-spacing:.6em;margin-bottom:.3em;">◆ ◇ ◆</div>
+  <div class="st">O Grau Perdido</div>
+  <div class="ss">Templo de Salomão · Jornada Interior</div>
+  <div class="sd"></div>
+  <div class="stx">Você é um Aprendiz que adentra as câmaras secretas.<br>Derrote as sombras da alma. Colete as ferramentas sagradas.</div>
+  <div class="sq">"Conhece-te a ti mesmo."</div>
+  <div class="sd"></div>
+  <button class="btn btnp" onclick="scr('sI')">Iniciar Jornada</button>
+  <button class="btn" onclick="go()">Jogar Direto</button>
+</div>
+
+<div class="screen hidden" id="sI">
+  <div class="st" style="font-size:2rem">Instruções</div><div class="sd"></div>
+  <div class="ig">
+    <div><span>A / ←</span> - Mover esquerda</div><div><span>D / →</span> - Mover direita</div>
+    <div><span>Shift</span> - Correr</div><div><span>Espaço</span> - Pular</div>
+    <div><span>J</span> - Atacar</div><div><span>K</span> - Habilidade especial</div>
+    <div><span>R</span> - Revelar (régua)</div><div><span>W / ↑</span> - Pular</div>
+  </div>
+  <div class="sd"></div>
+  <div class="stx">Sombras: <span style="color:#f2d468">Ignorância · Medo · Vaidade</span><br>Colete <b style="color:#f2d468">3 ferramentas</b> para abrir o portal final.</div>
+  <div class="sq">"A ferramenta só tem valor nas mãos de quem desperta."</div>
+  <button class="btn btnp" onclick="go()">Adentrar o Templo</button>
+  <button class="btn" onclick="scr('sT')">Voltar</button>
+</div>
+
+<div class="screen hidden" id="sO">
+  <div style="font-size:4rem;margin:.2em;filter:drop-shadow(0 0 24px #901010);">☽</div>
+  <div class="st" style="font-size:2.2rem;color:#c02818;text-shadow:0 0 40px rgba(200,30,10,.7);">A Sombra Venceu</div>
+  <div class="sd"></div>
+  <div class="stx">Você sucumbiu às trevas internas.<br>Todo tropeço é parte da construção.</div>
+  <div class="sq">"A luz não elimina a sombra; ela a revela."</div>
+  <div class="sd"></div>
+  <div id="oSc" style="color:#d4a843;font-size:1rem;margin:.4em;font-family:Georgia,serif;"></div>
+  <button class="btn btnp" onclick="go()">Tentar Novamente</button>
+  <button class="btn" onclick="scr('sT')">Menu</button>
+</div>
+
+<div class="screen hidden" id="sV">
+  <div style="font-size:4rem;margin:.2em;filter:drop-shadow(0 0 40px #d4a843);">☀</div>
+  <div class="st" style="font-size:2rem;">Jornada Concluída</div>
+  <div class="sd"></div>
+  <div class="stx">Você venceu a primeira etapa da jornada.<br><b style="color:#f2d468">A verdadeira construção é interior.</b></div>
+  <div class="sq">"Toda construção começa no interior."</div>
+  <div class="sd"></div>
+  <div id="vSc" style="color:#f2d468;font-size:1.1rem;margin:.4em;font-family:Georgia,serif;"></div>
+  <button class="btn btnp" onclick="go()">Jogar Novamente</button>
+  <button class="btn" onclick="scr('sT')">Menu</button>
+</div>
+
+</div></div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════
+// SETUP - high-DPI canvas
+// ═══════════════════════════════════════════════════
+const LOGIC_W=1024, LOGIC_H=640;
+const canvas=document.getElementById('c');
+const wrap=document.getElementById('wrap');
+const dpr=Math.min(window.devicePixelRatio||1,2);
+canvas.width=LOGIC_W*dpr; canvas.height=LOGIC_H*dpr;
+canvas.style.width=LOGIC_W+'px'; canvas.style.height=LOGIC_H+'px';
+wrap.style.width=LOGIC_W+'px'; wrap.style.height=LOGIC_H+'px';
+const ctx=canvas.getContext('2d');
+ctx.scale(dpr,dpr);
+const W=LOGIC_W, H=LOGIC_H;
+
+window.scr=function(id){['sT','sI','sO','sV'].forEach(s=>document.getElementById(s).classList.toggle('hidden',s!==id));}
+scr('sT');
+
+// Input
+const K={},JP={};
+window.addEventListener('keydown',e=>{if(!K[e.code])JP[e.code]=true;K[e.code]=true;
+  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();});
+window.addEventListener('keyup',e=>{K[e.code]=false;});
+function clrJP(){for(const k in JP)delete JP[k];}
+
+// Math helpers
+const rn=(a,b)=>Math.random()*(b-a)+a;
+const ri=(a,b)=>Math.floor(rn(a,b+1));
+const cl=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+function ov(ax,ay,aw,ah,bx,by,bw,bh){return ax<bx+bw&&ax+aw>bx&&ay<by+bh&&ay+ah>by;}
+
+// ═══════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════
+const WORLD_W=4200;
+const PW=30,PH=58;
+const GRAV=0.46, JV=-13.5, WSPD=2.2, RSPD=4.6;
+
+// ═══════════════════════════════════════════════════
+// OFFSCREEN BUFFERS - pre-render expensive backgrounds
+// ═══════════════════════════════════════════════════
+const BG_FAR=document.createElement('canvas');
+BG_FAR.width=WORLD_W; BG_FAR.height=H;
+const bfx=BG_FAR.getContext('2d');
+
+const BG_MID=document.createElement('canvas');
+BG_MID.width=WORLD_W; BG_MID.height=H;
+const bmx=BG_MID.getContext('2d');
+
+function prebakeBackgrounds(){
+  // ── FAR layer: sky + giant arches ──
+  const sk=bfx.createLinearGradient(0,0,0,H);
+  sk.addColorStop(0,'#06040e');sk.addColorStop(.4,'#0c0a18');sk.addColorStop(1,'#14100a');
+  bfx.fillStyle=sk;bfx.fillRect(0,0,WORLD_W,H);
+
+  // stars
+  bfx.fillStyle='rgba(255,245,210,.4)';
+  for(let i=0;i<280;i++){
+    const sx=rn(0,WORLD_W),sy=rn(4,160);
+    const ss=rn(.5,1.8);
+    bfx.beginPath();bfx.arc(sx,sy,ss,0,Math.PI*2);bfx.fill();
+  }
+  // faint moon circle high up
+  const moon=bfx.createRadialGradient(WORLD_W*.7,80,0,WORLD_W*.7,80,55);
+  moon.addColorStop(0,'rgba(220,210,180,.22)');moon.addColorStop(1,'rgba(0,0,0,0)');
+  bfx.fillStyle=moon;bfx.beginPath();bfx.arc(WORLD_W*.7,80,55,0,Math.PI*2);bfx.fill();
+
+  // giant background arches - full height decorative
+  for(let ax=0;ax<WORLD_W+300;ax+=300){
+    const aw=260, ah=480, ay=H-ah;
+    const cx=ax+aw/2;
+    // arch fill
+    const ag=bfx.createLinearGradient(ax,ay,ax+aw,ay+ah);
+    ag.addColorStop(0,'rgba(20,15,8,.95)');ag.addColorStop(1,'rgba(12,9,5,.98)');
+    bfx.fillStyle=ag;
+    bfx.beginPath();
+    bfx.moveTo(ax,H);bfx.lineTo(ax,ay+aw/2);
+    bfx.arc(cx,ay+aw/2,aw/2,Math.PI,0);
+    bfx.lineTo(ax+aw,H);bfx.closePath();bfx.fill();
+    // arch border glow
+    bfx.strokeStyle='rgba(80,58,18,.55)';bfx.lineWidth=2.5;
+    bfx.beginPath();
+    bfx.moveTo(ax,H);bfx.lineTo(ax,ay+aw/2);
+    bfx.arc(cx,ay+aw/2,aw/2,Math.PI,0);
+    bfx.lineTo(ax+aw,H);bfx.stroke();
+    // inner arch detail
+    bfx.strokeStyle='rgba(60,42,12,.35)';bfx.lineWidth=1;
+    bfx.beginPath();
+    bfx.moveTo(ax+18,H);bfx.lineTo(ax+18,ay+aw/2+14);
+    bfx.arc(cx,ay+aw/2+14,aw/2-18,Math.PI,0);
+    bfx.lineTo(ax+aw-18,H);bfx.stroke();
+  }
+
+  // ── MID layer: columns + floor band + ceiling coffers ──
+  // Ceiling coffer panels
+  for(let cx=0;cx<WORLD_W;cx+=120){
+    bmx.fillStyle=`rgba(${ri(14,20)},${ri(10,15)},${ri(6,10)},.9)`;
+    bmx.fillRect(cx+4,4,112,42);
+    bmx.strokeStyle='rgba(55,40,16,.6)';bmx.lineWidth=1;
+    bmx.strokeRect(cx+4,4,112,42);
+    // inner bevel
+    bmx.strokeStyle='rgba(35,25,10,.4)';
+    bmx.strokeRect(cx+10,8,100,34);
+  }
+
+  // Ornamental columns
+  for(let cx=0;cx<WORLD_W+160;cx+=160){
+    drawColumn(bmx,cx,44,18,H-44);
+  }
+
+  // Ground stones
+  const gy=H-44;
+  for(let gx=0;gx<WORLD_W;gx+=80){
+    const shade=ri(14,22);
+    bmx.fillStyle=`rgb(${shade},${shade-3},${shade-6})`;
+    bmx.fillRect(gx,gy,80,44);
+    bmx.strokeStyle='rgba(40,30,12,.5)';bmx.lineWidth=1;
+    bmx.strokeRect(gx,gy,80,44);
+    // subtle variation within stone
+    bmx.fillStyle=`rgba(${ri(22,30)},${ri(16,22)},${ri(8,14)},.3)`;
+    bmx.fillRect(gx+4,gy+4,72,36);
+  }
+}
+
+function drawColumn(c,x,y,w,h){
+  // Capital
+  c.fillStyle='#282010';c.fillRect(x-w*.4,y,w*1.8,14);
+  c.fillStyle='#201a0c';c.fillRect(x-w*.25,y+14,w*1.5,8);
+  // Shaft with fluting
+  const sg=c.createLinearGradient(x,0,x+w,0);
+  sg.addColorStop(0,'#161208');sg.addColorStop(.35,'#221c0e');sg.addColorStop(.65,'#1c1609');sg.addColorStop(1,'#100e06');
+  c.fillStyle=sg;c.fillRect(x,y+22,w,h-40);
+  // Flutes (vertical grooves)
+  c.strokeStyle='rgba(8,6,3,.6)';c.lineWidth=1.5;
+  const fl=4;
+  for(let i=0;i<fl;i++){
+    const fx=x+w*(i+.5)/fl;
+    c.beginPath();c.moveTo(fx,y+22);c.lineTo(fx,y+h-22);c.stroke();
+  }
+  // Subtle highlight
+  c.fillStyle='rgba(60,44,14,.25)';c.fillRect(x,y+22,4,h-40);
+  // Base
+  c.fillStyle='#201a0c';c.fillRect(x-w*.25,y+h-30,w*1.5,8);
+  c.fillStyle='#282010';c.fillRect(x-w*.4,y+h-22,w*1.8,22);
+}
+
+// ═══════════════════════════════════════════════════
+// WORLD
+// ═══════════════════════════════════════════════════
+let platforms=[],torches=[],doors=[],items=[],enemies=[];
+let portal=null;
+
+function buildWorld(){
+  platforms=[];torches=[];doors=[];items=[];enemies=[];
+
+  // Ground
+  platforms.push({x:0,y:H-44,w:WORLD_W,h:44,type:'G'});
+  // Ceiling
+  platforms.push({x:0,y:0,w:WORLD_W,h:48,type:'G'});
+  // Walls
+  platforms.push({x:0,y:0,w:24,h:H,type:'G'});
+  platforms.push({x:WORLD_W-24,y:0,w:24,h:H,type:'G'});
+
+  // Zone 1: 0-1000
+  addSlab(130,480,170);addSlab(340,400,150);addSlab(520,470,130);addSlab(700,420,150);
+  addSlab(220,320,100);addSlab(460,340,110);
+  platforms.push({x:590,y:H-44-22,w:110,h:22,type:'F'});
+  doors.push({x:870,y:420,w:36,h:176,open:false,need:['régua'],label:'Régua'});
+  addT(160,H-44);addT(440,H-44);addT(720,H-44);addT(220,312);addT(520,334);
+
+  // Zone 2: 1000-2000
+  addSlab(1020,490,130);addSlab(1170,420,110);addSlab(1310,350,130);
+  addSlab(1460,420,110);addSlab(1600,490,130);addSlab(1740,420,150);
+  platforms.push({x:1100,y:H-44-22,w:90,h:22,type:'F'});
+  platforms.push({x:1380,y:H-44-22,w:90,h:22,type:'F'});
+  doors.push({x:1940,y:390,w:36,h:206,open:false,need:['régua','compasso'],label:'2 Ferramentas'});
+  addT(1040,H-44);addT(1240,H-44);addT(1480,H-44);addT(1700,H-44);addT(1310,342);
+
+  // Zone 3: 2000-3000
+  addSlab(2020,490,110);addSlab(2180,410,130);addSlab(2340,340,110);
+  addSlab(2490,410,130);addSlab(2640,490,110);addSlab(2780,420,150);
+  platforms.push({x:2100,y:H-44-22,w:100,h:22,type:'F'});
+  doors.push({x:2970,y:370,w:36,h:226,open:false,need:['régua','compasso','esquadro'],label:'3 Ferramentas'});
+  addT(2040,H-44);addT(2260,H-44);addT(2520,H-44);addT(2780,H-44);addT(2340,332);
+
+  // Zone 4: 3000-4176
+  addSlab(3060,490,130);addSlab(3240,410,110);addSlab(3400,340,150);
+  addSlab(3590,410,110);addSlab(3760,490,130);addSlab(3900,420,150);
+  platforms.push({x:3140,y:H-44-22,w:90,h:22,type:'F'});
+  addT(3080,H-44);addT(3300,H-44);addT(3560,H-44);addT(3840,H-44);addT(3400,332);
+
+  portal={x:4060,y:360,w:68,h:236,active:false};
+
+  // Items
+  items=[
+    {n:'régua',   x:400,y:355,s:'▬',c:'#ede8c8',bt:0,col:false},
+    {n:'compasso',x:1310,y:305,s:'◎',c:'#90b8e8',bt:1.2,col:false},
+    {n:'esquadro',x:2340,y:295,s:'⊾',c:'#98d898',bt:2.4,col:false},
+    {n:'malhete', x:3400,y:295,s:'⬡',c:'#f0c878',bt:3.6,col:false},
+    {n:'avental', x:3060,y:445,s:'◇',c:'#f0a0b8',bt:4.8,col:false},
+  ];
+
+  // Enemies
+  const ep=[
+    ['I',250,H-44-38],['I',530,H-44-38],['M',750,H-44-38],
+    ['V',1100,H-44-38],['I',1380,H-44-38],['M',1640,H-44-38],
+    ['V',2080,H-44-38],['I',2380,H-44-38],['M',2680,H-44-38],
+    ['V',3100,H-44-38],['I',3420,H-44-38],['M',3700,H-44-38],['V',3900,H-44-38],
+  ];
+  ep.forEach(([t,x,y])=>{
+    const d=ED[t];
+    enemies.push({t,x,y,vx:d.sp*(Math.random()>.5?1:-1),vy:0,
+      hp:d.hp,mhp:d.hp,og:false,jt:ri(60,d.jcd),hf:0,dead:false,
+      af:0,at:0,fa:1,_hit:false});
+  });
+}
+
+function addSlab(x,y,w){platforms.push({x,y,w,h:24,type:'S'});}
+function addT(x,y){torches.push({x,y,f:0,t:0,ph:rn(0,Math.PI*2)});}
+
+const ED={
+  I:{hp:5,sp:.85,col1:'#3e2020',col2:'#5e2c2c',eye:'#ff2020',jcd:9999,sc:10,lb:'Ignorância'},
+  M:{hp:4,sp:1.5,col1:'#182038',col2:'#243460',eye:'#50a0ff',jcd:80, sc:15,lb:'Medo'},
+  V:{hp:4,sp:2.1,col1:'#3e3408',col2:'#5e5010',eye:'#ffd820',jcd:9999,sc:20,lb:'Vaidade'},
+};
+
+// ═══════════════════════════════════════════════════
+// PLAYER STATE
+// ═══════════════════════════════════════════════════
+const P={x:70,y:530,vx:0,vy:0,og:false,jl:1,fa:1,
+  hp:10,mhp:10,inv:0,
+  items:[],rR:false,rC:false,rE:false,rM:false,rA:false,
+  atk:false,at:0,acd:0,scd:0,sact:false,st:0,
+  rev:false,rt:0,wf:0,wt:0,_s3:false};
+
+function resetP(){
+  Object.assign(P,{x:70,y:530,vx:0,vy:0,og:false,jl:1,fa:1,
+    hp:10,mhp:10,inv:0,
+    items:[],rR:false,rC:false,rE:false,rM:false,rA:false,
+    atk:false,at:0,acd:0,scd:0,sact:false,st:0,
+    rev:false,rt:0,wf:0,wt:0,_s3:false});
+}
+
+// ═══════════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════════
+let running=false,gt=0,wis=0;
+let parts=[];
+let mt='',mtm=0;
+const cam={x:0};
+let atkHB=null;
+
+window.go=function(){
+  ['sT','sI','sO','sV'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  wis=0;gt=0;parts=[];mt='';mtm=0;
+  buildWorld();resetP();cam.x=0;
+  running=true;
+  msg('Conhece-te a ti mesmo.');
+}
+
+// ═══════════════════════════════════════════════════
+// LOOP
+// ═══════════════════════════════════════════════════
+let lt=0;
+(function loop(ts){
+  requestAnimationFrame(loop);
+  const dt=Math.min(ts-lt,33);lt=ts;
+  if(running)update();
+  draw();
+})();
+
+// ═══════════════════════════════════════════════════
+// UPDATE
+// ═══════════════════════════════════════════════════
+function update(){
+  gt++;
+  let mx=0;
+  if(K.KeyA||K.ArrowLeft)mx=-1;
+  if(K.KeyD||K.ArrowRight)mx=1;
+  if(mx)P.fa=mx;
+  const run=K.ShiftLeft||K.ShiftRight;
+  P.vx=mx*(run?RSPD:WSPD);
+
+  if((JP.Space||JP.ArrowUp||JP.KeyW)&&P.jl>0){
+    P.vy=JV;P.jl--;
+    sp(P.x+PW/2,P.y+PH,0,2,'#6a5020',12,3);
+  }
+  if(JP.KeyJ)doAtk();
+  if(JP.KeyK)doSpc();
+  if(JP.KeyR&&P.rR){P.rev=true;P.rt=320;msg('A luz revela o que estava oculto.');}
+
+  P.vy+=GRAV;P.vy=cl(P.vy,-20,16);
+  P.x+=P.vx;P.y+=P.vy;
+  P.x=cl(P.x,24,WORLD_W-PW-24);
+  if(P.y>H+80){P.hp--;P.y=530;P.x=Math.max(80,cam.x+100);P.vy=0;}
+
+  resPC();chkD();
+
+  if(P.at>0){P.at--;if(!P.at)P.atk=false;}
+  if(P.acd>0)P.acd--;
+  if(P.scd>0)P.scd--;
+  if(P.st>0)P.st--;
+  if(P.inv>0)P.inv--;
+  if(P.rt>0)P.rt--;else P.rev=false;
+
+  if(atkHB){
+    atkHB.t--;
+    atkHB.x=P.x+(P.fa>0?PW:-atkHB.w);
+    atkHB.y=P.y+12;
+    if(atkHB.t<=0)atkHB=null;
+  }
+
+  // Walk anim
+  if(Math.abs(P.vx)>.1){P.wt++;const spd=run?4:8;if(P.wt>spd){P.wt=0;P.wf=1-P.wf;}}
+  else P.wf=0;
+
+  // Enemies
+  enemies.forEach(e=>{
+    if(e.dead)return;
+    const d=ED[e.t];
+    const dx=(P.x+PW/2)-(e.x+20);
+    if(Math.abs(dx)<560)e.vx=d.sp*(dx>0?1:-1);
+    e.fa=e.vx>0?1:-1;
+    if(d.jcd<200){e.jt--;if(e.jt<=0&&e.og){e.vy=-11;e.jt=ri(60,d.jcd);}}
+    e.vy+=GRAV;e.vy=cl(e.vy,-18,14);
+    e.x+=e.vx;e.y+=e.vy;e.og=false;
+    platforms.forEach(p=>{
+      if(p.type==='F'&&p.broken)return;
+      if(!ov(e.x,e.y,38,42,p.x,p.y,p.w,p.h))return;
+      const ot=(e.y+42)-p.y,ob=(p.y+p.h)-e.y;
+      const ol=(e.x+38)-p.x,or2=(p.x+p.w)-e.x;
+      const mh=Math.min(ol,or2),mv=Math.min(ot,ob);
+      if(mv<mh){if(ot<ob){e.y-=ot;e.vy=0;e.og=true;}else{e.y+=ob;e.vy=0;}}
+      else{if(ol<or2){e.x-=ol;e.vx*=-1;}else{e.x+=or2;e.vx*=-1;}}
+    });
+    e.x=cl(e.x,24,WORLD_W-62);
+    if(e.hf>0)e.hf--;
+    e.at++;if(e.at>7){e.at=0;e.af=(e.af+1)%6;}
+    // atk hits enemy
+    if(atkHB&&ov(atkHB.x,atkHB.y,atkHB.w,atkHB.h,e.x,e.y,38,42)){
+      e.hp--;e.hf=14;wis++;
+      if(e.hp<=0)killE(e);
+      atkHB=null;
+    }
+    // enemy hits player
+    if(P.inv<=0&&ov(P.x,P.y,PW,PH,e.x,e.y,38,42)){
+      P.hp--;P.inv=95;P.vy=-5;P.vx=P.x<e.x?-4:4;
+      burst(P.x+PW/2,P.y+PH/2,'#cc2020');
+    }
+  });
+
+  // Fragile
+  if(P.rM&&atkHB){
+    platforms.forEach(p=>{
+      if(p.type!=='F'||p.broken)return;
+      if(ov(atkHB.x,atkHB.y,atkHB.w,atkHB.h,p.x,p.y,p.w,p.h)){
+        p.broken=true;wis+=2;burst(p.x+p.w/2,p.y+p.h/2,'#8a6020');
+      }
+    });
+  }
+
+  // Items
+  items.forEach(it=>{
+    if(it.col)return;
+    it.bt+=.05;
+    const iy=it.y+Math.sin(it.bt)*7;
+    if(ov(P.x,P.y,PW,PH,it.x-15,iy-15,30,30)){
+      it.col=true;collectI(it.n);pickup(it.x,iy);
+    }
+  });
+
+  // Portal
+  if(portal){
+    portal.active=P.items.length>=3;
+    if(portal.active&&ov(P.x,P.y,PW,PH,portal.x,portal.y,portal.w,portal.h)){win();return;}
+  }
+  if(P.hp<=0){over();return;}
+
+  parts=parts.filter(p=>p.l>0);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.09;p.l--;});
+  torches.forEach(t=>{t.t++;if(t.t>5){t.t=0;t.f=(t.f+1)%6;}});
+
+  cam.x+=(P.x+PW/2-W/2-cam.x)*.11;
+  cam.x=cl(cam.x,0,WORLD_W-W);
+
+  if(mtm>0)mtm--;
+  if(!mtm&&gt%620===0){
+    const ph=["Conhece-te a ti mesmo.","A luz não elimina a sombra; ela a revela.",
+      "Toda construção começa no interior.","A ferramenta só tem valor nas mãos de quem desperta.",
+      "O verdadeiro templo é construído em silêncio.","Quem vence a si mesmo, vence tudo."];
+    msg(ph[Math.floor(gt/620)%ph.length]);
+  }
+  if(P.items.length>=3&&!P._s3){P._s3=true;msg('Você está pronto para atravessar o próximo portal.');}
+  clrJP();
+}
+
+function resPC(){
+  P.og=false;
+  platforms.forEach(p=>{
+    if(p.type==='F'&&p.broken)return;
+    if(p.type==='H'&&!P.rev)return;
+    if(!ov(P.x,P.y,PW,PH,p.x,p.y,p.w,p.h))return;
+    const ol=(P.x+PW)-p.x,or2=(p.x+p.w)-P.x;
+    const ot=(P.y+PH)-p.y,ob=(p.y+p.h)-P.y;
+    const mh=Math.min(ol,or2),mv=Math.min(ot,ob);
+    if(mv<mh){
+      if(ot<ob){P.y-=ot;if(P.vy>0){P.vy=0;P.og=true;P.jl=P.rC?2:1;}}
+      else{P.y+=ob;if(P.vy<0)P.vy=0;}
+    }else{if(ol<or2)P.x-=ol;else P.x+=or2;P.vx=0;}
+  });
+}
+
+function chkD(){
+  doors.forEach(d=>{
+    if(d.open)return;
+    if(ov(P.x,P.y,PW,PH,d.x,d.y,d.w,d.h)){
+      const m=P.x+PW/2;if(m<d.x+d.w/2)P.x=d.x-PW-1;else P.x=d.x+d.w+1;P.vx=0;
+    }
+    if(d.need.every(n=>P.items.includes(n))){d.open=true;msg('O portal se abre diante de você.');}
+  });
+}
+
+function doAtk(){
+  if(P.acd>0)return;
+  P.atk=true;P.at=20;P.acd=30;
+  const rch=P.rC?85:60;
+  atkHB={x:P.x+(P.fa>0?PW:-rch),y:P.y+12,w:rch,h:PH-20,t:16};
+  for(let i=0;i<7;i++)sp(P.x+PW/2+P.fa*34,P.y+22,P.fa*rn(2,6)+rn(-1,1),rn(-3,2),'#e8c46a',ri(10,20),rn(2.5,5));
+}
+
+function doSpc(){
+  if(P.scd>0||!P.items.length)return;
+  P.sact=true;P.st=40;P.scd=210;wis+=5;
+  const cx=P.x+PW/2,cy=P.y+PH/2;
+  enemies.forEach(e=>{
+    if(e.dead)return;
+    if(Math.hypot(cx-(e.x+19),cy-(e.y+21))<155){e.hp-=2;e.hf=16;if(e.hp<=0)killE(e);}
+  });
+  for(let i=0;i<32;i++){
+    const a=(i/32)*Math.PI*2;
+    sp(cx,cy,Math.cos(a)*7,Math.sin(a)*7,'#f0d060',ri(28,50),rn(3,6));
+  }
+  msg('A ferramenta só tem valor nas mãos de quem desperta.');
+}
+
+function killE(e){e.dead=true;wis+=ED[e.t].sc;burst(e.x+19,e.y+21,ED[e.t].col2);}
+function collectI(n){
+  if(P.items.includes(n))return;P.items.push(n);wis+=50;
+  const ms={
+    'régua':'Régua obtida - pressione R para revelar caminhos ocultos.',
+    'compasso':'Compasso obtido - duplo pulo desbloqueado!',
+    'esquadro':'Esquadro obtido - portas especiais se abrem.',
+    'malhete':'Malhete obtido - quebre blocos frágeis com J.',
+    'avental':'Avental obtido - sua proteção aumenta.',
+  };
+  switch(n){
+    case'régua':P.rR=true;break;case'compasso':P.rC=true;P.jl=2;break;
+    case'esquadro':P.rE=true;break;case'malhete':P.rM=true;break;
+    case'avental':P.rA=true;P.mhp=12;P.hp=Math.min(P.hp+2,12);break;
+  }
+  msg(ms[n]);
+}
+function msg(t){mt=t;mtm=240;}
+function sp(x,y,vx,vy,c,l,sz){parts.push({x,y,vx,vy,color:c,l,ml:l,sz});}
+function burst(x,y,c){for(let i=0;i<16;i++){const a=rn(0,Math.PI*2),s=rn(1,5);sp(x,y,Math.cos(a)*s,Math.sin(a)*s,c,ri(20,40),rn(2,5.5));}}
+function pickup(x,y){for(let i=0;i<22;i++){const a=rn(0,Math.PI*2),s=rn(1.5,6);sp(x,y,Math.cos(a)*s,Math.sin(a)*s,'#f0d060',ri(28,55),rn(2.5,6));}}
+function over(){running=false;document.getElementById('oSc').textContent=`Sabedoria: ${wis}`;document.getElementById('sO').classList.remove('hidden');}
+function win(){running=false;document.getElementById('vSc').textContent=`Sabedoria: ${wis} · Ferramentas: ${P.items.length}/5`;document.getElementById('sV').classList.remove('hidden');}
+
+// ═══════════════════════════════════════════════════
+// DRAW
+// ═══════════════════════════════════════════════════
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // Parallax BG
+  const fx=cam.x*.12, mx2=cam.x*.45;
+  ctx.drawImage(BG_FAR,-fx%WORLD_W,0,WORLD_W,H,0,0,WORLD_W,H); // simple offset
+  // Faster: just clip offset draw
+  ctx.save();
+  ctx.drawImage(BG_FAR,cl(fx,0,WORLD_W-W),0,W,H,0,0,W,H);
+  ctx.restore();
+  ctx.save();
+  ctx.drawImage(BG_MID,cl(mx2,0,WORLD_W-W),0,W,H,0,0,W,H);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-Math.floor(cam.x),0);
+  drawPlats();drawTorches();drawDoors();drawPortal();drawItems();
+  drawEnemies();drawPlayer();
+  if(atkHB)drawAtkFX();
+  drawParts();
+  ctx.restore();
+
+  drawHUD();drawMsg();
+}
+
+// ── Platforms ──
+function drawPlats(){
+  platforms.forEach(p=>{
+    if(p.type==='F'&&p.broken)return;
+    if(p.type==='H'&&!P.rev){ctx.fillStyle='rgba(60,80,180,.05)';ctx.fillRect(p.x,p.y,p.w,p.h);return;}
+    if(p.type==='G')return; // ground/ceiling from bg buffer
+
+    const isF=p.type==='F';
+    // Main body
+    const g=ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);
+    if(isF){g.addColorStop(0,'#302014');g.addColorStop(1,'#1c1208');}
+    else{g.addColorStop(0,'#2e2618');g.addColorStop(.5,'#22190f');g.addColorStop(1,'#161009');}
+    ctx.fillStyle=g;ctx.fillRect(p.x,p.y,p.w,p.h);
+    // Top face (lighter)
+    ctx.fillStyle=isF?'rgba(200,130,40,.45)':'rgba(110,85,28,.5)';
+    ctx.fillRect(p.x,p.y,p.w,4);
+    // Bottom shadow
+    ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(p.x,p.y+p.h-4,p.w,4);
+    // Mortar joints
+    ctx.strokeStyle=isF?'rgba(180,100,20,.3)':'rgba(45,34,13,.5)';
+    ctx.lineWidth=1;
+    const bw=44;
+    for(let bx=p.x;bx<p.x+p.w;bx+=bw){ctx.strokeRect(bx,p.y,Math.min(bw,p.x+p.w-bx),p.h);}
+    // Stone face texture
+    ctx.fillStyle=`rgba(${ri(20,32)},${ri(15,24)},${ri(6,12)},.2)`;
+    ctx.fillRect(p.x+2,p.y+4,p.w-4,p.h-8);
+    if(isF){
+      // crack lines
+      ctx.strokeStyle='rgba(200,140,40,.55)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(p.x+p.w*.2,p.y);ctx.lineTo(p.x+p.w*.35,p.y+p.h);
+      ctx.moveTo(p.x+p.w*.65,p.y);ctx.lineTo(p.x+p.w*.5,p.y+p.h);ctx.stroke();
+    }
+  });
+}
+
+// ── Torches ──
+function drawTorches(){
+  torches.forEach(t=>{
+    const x=t.x,y=t.y-2;
+    // Wall sconce bracket
+    ctx.fillStyle='#302010';ctx.fillRect(x-4,y-20,8,20);
+    ctx.fillStyle='#484020';ctx.fillRect(x-7,y-22,14,6);
+    // Cup
+    ctx.fillStyle='#201808';ctx.fillRect(x-5,y-24,10,6);
+    ctx.fillStyle='#382c10';ctx.fillRect(x-4,y-22,8,4);
+
+    const ph=t.ph+gt*.12;
+    const fl=[0,1,-1,1,-1,0][t.f];
+    // Large ambient glow on wall/floor
+    const gw=ctx.createRadialGradient(x,y-26,0,x,y-26,80);
+    gw.addColorStop(0,'rgba(255,150,30,.2)');gw.addColorStop(.4,'rgba(200,80,10,.1)');gw.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=gw;ctx.beginPath();ctx.arc(x,y-26,80,0,Math.PI*2);ctx.fill();
+    // Small glow
+    const gs=ctx.createRadialGradient(x,y-28,0,x,y-28,26);
+    gs.addColorStop(0,'rgba(255,200,60,.55)');gs.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=gs;ctx.beginPath();ctx.arc(x,y-28,26,0,Math.PI*2);ctx.fill();
+
+    // Flame layers - outer → inner → core
+    const fph=Math.sin(ph);
+    ctx.fillStyle=`rgba(220,70,10,${.85+fph*.1})`;
+    ctx.beginPath();ctx.ellipse(x+fl,y-32,9+Math.abs(fph)*2,16,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=`rgba(255,140,20,${.9+fph*.08})`;
+    ctx.beginPath();ctx.ellipse(x+fl*.6,y-35,6,12,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=`rgba(255,220,60,${.95})`;
+    ctx.beginPath();ctx.ellipse(x+fl*.3,y-38,3.5,7,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,200,.9)';
+    ctx.beginPath();ctx.ellipse(x,y-40,1.8,4,0,0,Math.PI*2);ctx.fill();
+    // Embers
+    for(let i=0;i<3;i++){
+      const ex=x+Math.sin(ph*1.3+i*2)*6;
+      const ey=y-32-Math.abs(Math.sin(ph*.7+i))*14;
+      ctx.fillStyle='rgba(255,160,30,.7)';
+      ctx.beginPath();ctx.arc(ex,ey,1.2,0,Math.PI*2);ctx.fill();
+    }
+  });
+}
+
+// ── Doors ──
+function drawDoors(){
+  doors.forEach(d=>{
+    if(d.open){
+      const og=ctx.createLinearGradient(d.x,d.y,d.x+d.w,d.y+d.h);
+      og.addColorStop(0,'rgba(200,160,50,.07)');og.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=og;ctx.fillRect(d.x,d.y,d.w,d.h);return;
+    }
+    // Stone archway top
+    ctx.strokeStyle='rgba(90,68,22,.7)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(d.x+d.w/2,d.y,d.w/2,Math.PI,0);ctx.stroke();
+    ctx.strokeStyle='rgba(55,40,12,.4)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(d.x+d.w/2,d.y,d.w/2-6,Math.PI,0);ctx.stroke();
+
+    // Door body
+    ctx.fillStyle='#120c06';ctx.fillRect(d.x,d.y,d.w,d.h);
+    // Plank texture
+    for(let dy=d.y+3;dy<d.y+d.h-3;dy+=20){
+      ctx.fillStyle=`rgba(${ri(22,30)},${ri(14,20)},${ri(7,12)},.9)`;
+      ctx.fillRect(d.x+3,dy,d.w-6,17);
+    }
+    // Wood grain
+    ctx.strokeStyle='rgba(8,5,2,.4)';ctx.lineWidth=1;
+    for(let dy=d.y+5;dy<d.y+d.h-5;dy+=20){
+      for(let lx=0;lx<3;lx++){
+        ctx.beginPath();ctx.moveTo(d.x+6+lx*8,dy);ctx.lineTo(d.x+8+lx*8,dy+14);ctx.stroke();
+      }
+    }
+    // Iron bands with rivets
+    ctx.fillStyle='#2a2214';
+    ctx.fillRect(d.x+2,d.y+d.h*.26,d.w-4,8);
+    ctx.fillRect(d.x+2,d.y+d.h*.6,d.w-4,8);
+    ctx.fillStyle='#403418';
+    for(let ri2=0;ri2<4;ri2++){
+      const rx=d.x+5+ri2*(d.w-8)/3;
+      ctx.beginPath();ctx.arc(rx,d.y+d.h*.26+4,2.5,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(rx,d.y+d.h*.6+4,2.5,0,Math.PI*2);ctx.fill();
+    }
+    // Lock
+    ctx.fillStyle='rgba(212,160,50,.6)';ctx.font='bold 18px serif';ctx.textAlign='center';
+    ctx.fillText('⊗',d.x+d.w/2,d.y+d.h/2+7);
+    ctx.fillStyle='rgba(160,120,40,.5)';ctx.font='8px Georgia,serif';
+    ctx.fillText(d.label,d.x+d.w/2,d.y-10);
+  });
+}
+
+// ── Portal ──
+function drawPortal(){
+  if(!portal)return;
+  const p=portal,cx=p.x+p.w/2,cy=p.y+p.h/2;
+  const pulse=Math.sin(gt*.065)*.35+.65;
+  const act=p.active;
+
+  // Outer atmospheric glow
+  const og=ctx.createRadialGradient(cx,cy,0,cx,cy,act?120:55);
+  og.addColorStop(0,act?`rgba(210,170,50,${.55*pulse})`:'rgba(45,35,15,.2)');
+  og.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=og;ctx.beginPath();ctx.arc(cx,cy,act?120:55,0,Math.PI*2);ctx.fill();
+
+  // Arch surround
+  ctx.strokeStyle=act?`rgba(220,175,55,${.95*pulse})`:'rgba(65,50,18,.6)';ctx.lineWidth=5;
+  ctx.beginPath();
+  ctx.moveTo(p.x,p.y+p.h);ctx.lineTo(p.x,p.y+p.w/2);
+  ctx.arc(cx,p.y+p.w/2,p.w/2,Math.PI,0);ctx.lineTo(p.x+p.w,p.y+p.h);ctx.stroke();
+  // Inner arch
+  ctx.strokeStyle=act?`rgba(240,200,80,${.5*pulse})`:'rgba(40,30,10,.4)';ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(p.x+8,p.y+p.h);ctx.lineTo(p.x+8,p.y+p.w/2+8);
+  ctx.arc(cx,p.y+p.w/2+8,p.w/2-8,Math.PI,0);ctx.lineTo(p.x+p.w-8,p.y+p.h);ctx.stroke();
+
+  if(act){
+    // Shimmering fill
+    const ig=ctx.createRadialGradient(cx,cy,0,cx,cy,p.w*1.2);
+    ig.addColorStop(0,`rgba(240,200,80,${.32*pulse})`);
+    ig.addColorStop(.5,`rgba(180,140,40,${.18*pulse})`);
+    ig.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=ig;ctx.fillRect(p.x,p.y,p.w,p.h);
+
+    // Animated sacred geometry
+    ctx.save();ctx.translate(cx,cy);
+    // Outer hexagram
+    ctx.rotate(gt*.02);ctx.strokeStyle=`rgba(240,200,80,${.65*pulse})`;ctx.lineWidth=1.5;
+    for(let i=0;i<6;i++){
+      const a=(i/6)*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*42,Math.sin(a)*42);ctx.stroke();
+    }
+    ctx.beginPath();ctx.arc(0,0,30,0,Math.PI*2);ctx.stroke();
+    // Inner square
+    ctx.rotate(Math.PI*.25+gt*.015);ctx.strokeStyle=`rgba(255,220,100,${.5*pulse})`;
+    ctx.strokeRect(-18,-18,36,36);
+    // Innermost circle
+    ctx.rotate(-gt*.04);ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle=`rgba(240,200,80,${pulse})`;ctx.font='bold 13px Georgia,serif';ctx.textAlign='center';
+    ctx.fillText('PORTAL DA LUZ',cx,p.y-15);
+  } else {
+    ctx.fillStyle='rgba(90,70,25,.55)';ctx.font='24px serif';ctx.textAlign='center';
+    ctx.fillText('⊗',cx,cy+9);
+    ctx.fillStyle='rgba(160,120,40,.5)';ctx.font='9px Georgia,serif';
+    ctx.fillText('3 ferramentas necessárias',cx,p.y-12);
+  }
+}
+
+// ── Items ──
+function drawItems(){
+  items.forEach(it=>{
+    if(it.col)return;
+    const iy=it.y+Math.sin(it.bt)*8;
+    // Ambient glow
+    const ag=ctx.createRadialGradient(it.x,iy,0,it.x,iy,38);
+    ag.addColorStop(0,hexA(it.c,.28));ag.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=ag;ctx.beginPath();ctx.arc(it.x,iy,38,0,Math.PI*2);ctx.fill();
+    // Orbit ring
+    ctx.save();ctx.translate(it.x,iy);ctx.rotate(gt*.05);
+    ctx.strokeStyle=hexA(it.c,.5);ctx.lineWidth=1.5;
+    ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([]);ctx.restore();
+    // Gem body
+    ctx.beginPath();ctx.arc(it.x,iy,16,0,Math.PI*2);
+    ctx.strokeStyle=it.c;ctx.lineWidth=2.5;ctx.stroke();
+    ctx.fillStyle='rgba(8,6,4,.88)';ctx.fill();
+    // Inner gleam
+    ctx.fillStyle=hexA(it.c,.15);ctx.beginPath();ctx.arc(it.x,iy,12,0,Math.PI*2);ctx.fill();
+    // Symbol
+    ctx.fillStyle=it.c;ctx.font='bold 18px serif';ctx.textAlign='center';
+    ctx.fillText(it.s,it.x,iy+7);
+    // Highlight sparkle
+    ctx.fillStyle='rgba(255,255,255,.45)';ctx.beginPath();ctx.arc(it.x-5,iy-5,3,0,Math.PI*2);ctx.fill();
+    // Name
+    ctx.fillStyle='rgba(212,168,67,.65)';ctx.font='8px Georgia,serif';
+    ctx.fillText(it.n,it.x,iy-21);
+  });
+}
+function hexA(h,a){const n=parseInt(h.replace('#',''),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
+
+// ═══════════════════════════════════════════════════
+// ENEMY DRAWING - full detailed sprites
+// ═══════════════════════════════════════════════════
+function drawEnemies(){
+  enemies.forEach(e=>{
+    if(e.dead)return;
+    const d=ED[e.t],x=e.x,y=e.y;
+    ctx.save();
+    if(e.hf>0)ctx.globalAlpha=.35+Math.sin(e.hf*.85)*.65;
+    // drop shadow
+    ctx.fillStyle='rgba(0,0,0,.4)';
+    ctx.beginPath();ctx.ellipse(x+19,y+44,17,5,0,0,Math.PI*2);ctx.fill();
+    // type-specific sprite
+    if(e.t==='I')drawIgnorance(x,y,e.fa,e.af,e.hf,d);
+    else if(e.t==='M')drawFear(x,y,e.fa,e.af,e.hf,d,e.og);
+    else drawVanity(x,y,e.fa,e.af,e.hf,d);
+    // HP bar
+    ctx.globalAlpha=1;
+    const bw=36,bx=x+1,by=y-13;
+    ctx.fillStyle='#1a0505';ctx.fillRect(bx,by,bw,5);
+    const hpg=ctx.createLinearGradient(bx,0,bx+bw,0);
+    hpg.addColorStop(0,`hsl(${e.hp/e.mhp*120},80%,35%)`);
+    hpg.addColorStop(1,`hsl(${e.hp/e.mhp*120},90%,50%)`);
+    ctx.fillStyle=hpg;ctx.fillRect(bx,by,bw*(e.hp/e.mhp),5);
+    ctx.strokeStyle='#3a1010';ctx.lineWidth=1;ctx.strokeRect(bx,by,bw,5);
+    ctx.fillStyle='rgba(200,160,80,.5)';ctx.font='7px Georgia,serif';ctx.textAlign='center';
+    ctx.fillText(d.lb,x+19,y-15);
+    ctx.restore();
+  });
+}
+
+function drawIgnorance(x,y,dir,af,hf,d){
+  // ── Ignorance: huge hunched wraith with skull-face, tattered robes, dragging claws ──
+  const bob=af%2===0?0:2.5;
+  const hfl=hf>0;
+
+  // Tattered robe hem - multiple jagged strips
+  for(let i=0;i<6;i++){
+    const tx=x+i*6+2,ty=y+34+bob,th=10+Math.sin(af*.5+i*1.1)*5;
+    ctx.fillStyle=hfl?'#cc3030':`rgba(${ri(50,68)},${ri(20,32)},${ri(18,26)},.9)`;
+    ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(tx+5,ty+th);ctx.lineTo(tx+6,ty);ctx.closePath();ctx.fill();
+  }
+  // Main body/robe
+  const bg=ctx.createLinearGradient(x,y+8,x+36,y+36);
+  bg.addColorStop(0,hfl?'#cc3030':d.col2);bg.addColorStop(1,hfl?'#881818':d.col1);
+  ctx.fillStyle=bg;ctx.fillRect(x+2,y+10+bob,32,28);
+  // Robe folds (shadow lines)
+  ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x+10,y+10+bob);ctx.lineTo(x+12,y+36+bob);
+  ctx.moveTo(x+20,y+10+bob);ctx.lineTo(x+20,y+36+bob);
+  ctx.moveTo(x+28,y+10+bob);ctx.lineTo(x+26,y+36+bob);ctx.stroke();
+
+  // Long dragging arms with huge claws
+  ctx.fillStyle=hfl?'#dd2828':d.col2;
+  const armSw=Math.sin(af*.4)*8;
+  if(dir>0){
+    // leading arm reaches forward
+    ctx.fillRect(x+30,y+14+bob+armSw,14,6); // forearm
+    ctx.fillRect(x+42,y+13+bob+armSw,6,18); // upper claw region
+    // claws
+    ctx.fillStyle=hfl?'#ff7070':'#2a0808';
+    for(let c=0;c<4;c++)ctx.fillRect(x+44+c*2,y+28+bob+armSw+c,2,8+c);
+    // back arm
+    ctx.fillStyle=hfl?'#dd2828':d.col2;
+    ctx.fillRect(x-6,y+16+bob-armSw*.5,10,5);
+    ctx.fillRect(x-10,y+14+bob-armSw*.5,6,14);
+    ctx.fillStyle=hfl?'#ff7070':'#2a0808';
+    for(let c=0;c<3;c++)ctx.fillRect(x-14+c*2,y+26+bob-armSw*.5,2,7);
+  } else {
+    ctx.fillRect(x-8,y+14+bob+armSw,14,6);
+    ctx.fillRect(x-14,y+13+bob+armSw,6,18);
+    ctx.fillStyle=hfl?'#ff7070':'#2a0808';
+    for(let c=0;c<4;c++)ctx.fillRect(x-16-c*2,y+28+bob+armSw+c,2,8+c);
+    ctx.fillStyle=hfl?'#dd2828':d.col2;
+    ctx.fillRect(x+34,y+16+bob-armSw*.5,10,5);
+    ctx.fillRect(x+36,y+14+bob-armSw*.5,6,14);
+    ctx.fillStyle=hfl?'#ff7070':'#2a0808';
+    for(let c=0;c<3;c++)ctx.fillRect(x+40+c*2,y+26+bob-armSw*.5,2,7);
+  }
+
+  // Skull/hooded head
+  ctx.fillStyle=hfl?'#cc2828':d.col1;
+  ctx.beginPath();ctx.arc(x+18,y+6+bob,11,0,Math.PI*2);ctx.fill();
+  // Hood shadow
+  ctx.fillStyle=hfl?'#882020':shd(d.col1,20);
+  ctx.beginPath();ctx.arc(x+18,y+4+bob,13,Math.PI*.8,Math.PI*2.2);ctx.lineTo(x+18,y+6+bob);ctx.closePath();ctx.fill();
+  // Eye sockets (dark)
+  ctx.fillStyle='rgba(0,0,0,.7)';
+  ctx.beginPath();ctx.ellipse(x+(dir>0?12:24),y+6+bob,4,3,0,0,Math.PI*2);ctx.fill();
+  // Glowing red eyes
+  const eg=ctx.createRadialGradient(x+(dir>0?12:24),y+6+bob,0,x+(dir>0?12:24),y+6+bob,6);
+  eg.addColorStop(0,'rgba(255,50,20,.95)');eg.addColorStop(.4,'rgba(220,20,0,.7)');eg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(x+(dir>0?12:24),y+6+bob,6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#ff3010';ctx.beginPath();ctx.arc(x+(dir>0?12:24),y+6+bob,2.5,0,Math.PI*2);ctx.fill();
+  // Nasal bone / brow ridge
+  ctx.strokeStyle='rgba(40,20,20,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x+(dir>0?8:15),y+3+bob);ctx.lineTo(x+(dir>0?16:23),y+2+bob);ctx.stroke();
+  // Dark aura wisps
+  for(let w=0;w<3;w++){
+    const wa=rn(0,Math.PI*2);
+    ctx.fillStyle='rgba(30,0,0,.35)';
+    ctx.beginPath();ctx.ellipse(x+18+Math.cos(wa)*16,y+20+bob+Math.sin(wa)*8,4,2,wa,0,Math.PI*2);ctx.fill();
+  }
+}
+
+function drawFear(x,y,dir,af,hf,d,og){
+  // ── Fear: agile wraith, thin billowing cloak, electric blue eyes, speed lines ──
+  const bob=og?af%2===0?0:1:0;
+  const stretch=og?0:-2;
+  const hfl=hf>0;
+
+  // Billowing cloak tails
+  for(let i=0;i<5;i++){
+    const tx=x+3+i*7,ty=y+30+bob,th=12+Math.sin(af*.6+i*1.3)*7+stretch;
+    const cg=ctx.createLinearGradient(tx,ty,tx,ty+th);
+    cg.addColorStop(0,hfl?'rgba(120,120,255,.8)':`rgba(${ri(24,38)},${ri(34,55)},${ri(60,90)},.8)`);
+    cg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=cg;
+    ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(tx+2,ty+th);ctx.lineTo(tx+6,ty+th*.7);ctx.lineTo(tx+7,ty);ctx.closePath();ctx.fill();
+  }
+
+  // Body
+  const bg=ctx.createLinearGradient(x+4,y+8,x+32,y+32);
+  bg.addColorStop(0,hfl?'#7070ff':d.col2);bg.addColorStop(1,hfl?'#3030cc':d.col1);
+  ctx.fillStyle=bg;ctx.fillRect(x+5,y+8+bob,26,24+stretch);
+  // Vertical stripe
+  ctx.fillStyle='rgba(80,120,200,.3)';ctx.fillRect(x+16,y+8+bob,5,24+stretch);
+
+  // Outstretched reaching arms
+  const armR=Math.sin(af*.5)*7;
+  ctx.fillStyle=hfl?'#8080ff':d.col2;
+  if(dir>0){
+    ctx.fillRect(x+29,y+12+bob+armR,16,5);
+    ctx.fillRect(x+43,y+10+bob+armR,5,15);
+    // Fingers (grasping)
+    ctx.fillStyle=hfl?'#c0c0ff':'#0a1830';
+    for(let c=0;c<4;c++)ctx.fillRect(x+46+c*2,y+10+bob+armR+c*3,1.5,6-c);
+    ctx.fillRect(x-6,y+14+bob-armR*.4,10,4);
+    ctx.fillRect(x-10,y+12+bob-armR*.4,5,11);
+  } else {
+    ctx.fillRect(x-8,y+12+bob+armR,16,5);
+    ctx.fillRect(x-12,y+10+bob+armR,5,15);
+    ctx.fillStyle=hfl?'#c0c0ff':'#0a1830';
+    for(let c=0;c<4;c++)ctx.fillRect(x-14-c*2,y+10+bob+armR+c*3,1.5,6-c);
+    ctx.fillRect(x+34,y+14+bob-armR*.4,10,4);
+    ctx.fillRect(x+37,y+12+bob-armR*.4,5,11);
+  }
+
+  // Head - elongated
+  ctx.fillStyle=hfl?'#9090ff':d.col1;
+  ctx.beginPath();ctx.ellipse(x+18,y+5+bob,9,11,0,0,Math.PI*2);ctx.fill();
+  // Hood wisp top
+  ctx.fillStyle=hfl?'#6060dd':shd(d.col1,15);
+  ctx.beginPath();ctx.arc(x+18,y+2+bob,11,Math.PI*.9,Math.PI*2.1);ctx.lineTo(x+18,y+5+bob);ctx.closePath();ctx.fill();
+  // Electric eyes
+  const eyeX=x+(dir>0?12:24);
+  const eg=ctx.createRadialGradient(eyeX,y+5+bob,0,eyeX,y+5+bob,8);
+  eg.addColorStop(0,'rgba(180,230,255,.95)');eg.addColorStop(.3,'rgba(50,150,255,.8)');eg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(eyeX,y+5+bob,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#a0dcff';ctx.beginPath();ctx.arc(eyeX,y+5+bob,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(200,240,255,.8)';ctx.beginPath();ctx.arc(eyeX,y+5+bob,1.5,0,Math.PI*2);ctx.fill();
+  // Speed lines
+  if(af%2){
+    ctx.strokeStyle='rgba(50,100,200,.3)';ctx.lineWidth=1;
+    for(let l=0;l<4;l++){
+      const ly=y+10+l*7+bob;const len=8+l*3;
+      ctx.beginPath();ctx.moveTo(x+(dir>0?-len:38),ly);ctx.lineTo(x+(dir>0?0:38+len),ly);ctx.stroke();
+    }
+  }
+}
+
+function drawVanity(x,y,dir,af,hf,d){
+  // ── Vanity: ornate royal specter with crown, golden robes, self-glow ──
+  const bob=af%2===0?-1.5:1.5;
+  const hfl=hf>0;
+
+  // Royal robe - wide, ornate
+  const rg=ctx.createLinearGradient(x,y+10,x+36,y+40);
+  rg.addColorStop(0,hfl?'#ffee80':d.col2);rg.addColorStop(1,hfl?'#ccbb30':d.col1);
+  ctx.fillStyle=rg;ctx.fillRect(x+2,y+10+bob,32,32);
+  // Robe flare at hem
+  ctx.fillStyle=hfl?'#ffdd60':shd(d.col2,10);
+  ctx.beginPath();
+  ctx.moveTo(x,y+36+bob);ctx.lineTo(x-4,y+44+bob);ctx.lineTo(x+40,y+44+bob);ctx.lineTo(x+36,y+36+bob);
+  ctx.closePath();ctx.fill();
+  // Gold trim
+  ctx.strokeStyle=hfl?'#ffffa0':'rgba(200,160,15,.8)';ctx.lineWidth=2;
+  ctx.strokeRect(x+2,y+10+bob,32,32);
+  ctx.beginPath();ctx.moveTo(x+18,y+10+bob);ctx.lineTo(x+18,y+40+bob);ctx.stroke();
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x+4,y+22+bob);ctx.lineTo(x+32,y+22+bob);ctx.stroke();
+  // Jewel pattern on robe
+  const jc=['#ff4040','#40ff80','#4080ff','#ffff40'];
+  for(let j=0;j<4;j++){
+    const jx=x+8+j*7,jy=y+26+bob;
+    ctx.fillStyle=jc[j];
+    ctx.beginPath();ctx.moveTo(jx,jy-3);ctx.lineTo(jx+3,jy);ctx.lineTo(jx,jy+3);ctx.lineTo(jx-3,jy);ctx.closePath();ctx.fill();
+  }
+
+  // Arms with gold bracers
+  ctx.fillStyle=hfl?'#ffcc40':shd(d.col2,-10);
+  const armW=Math.sin(af*.5)*6;
+  if(dir>0){
+    ctx.fillRect(x+32,y+14+bob+armW,12,6);ctx.fillRect(x+38,y+12+bob+armW,8,16);
+    ctx.fillStyle=hfl?'#ffe880':'#c89010';
+    ctx.fillRect(x+38,y+14+bob+armW,8,5);
+    ctx.fillRect(x-4,y+14+bob-armW*.5,10,5);ctx.fillStyle=hfl?'#ffcc40':shd(d.col2,-10);
+    ctx.fillRect(x-8,y+12+bob-armW*.5,6,14);
+  } else {
+    ctx.fillRect(x-6,y+14+bob+armW,12,6);ctx.fillRect(x-12,y+12+bob+armW,8,16);
+    ctx.fillStyle=hfl?'#ffe880':'#c89010';
+    ctx.fillRect(x-12,y+14+bob+armW,8,5);
+    ctx.fillRect(x+32,y+14+bob-armW*.5,10,5);ctx.fillStyle=hfl?'#ffcc40':shd(d.col2,-10);
+    ctx.fillRect(x+34,y+12+bob-armW*.5,6,14);
+  }
+
+  // Head
+  ctx.fillStyle='#d0aa78';ctx.beginPath();ctx.arc(x+18,y+7+bob,10,0,Math.PI*2);ctx.fill();
+  // Smug expression
+  ctx.strokeStyle='rgba(90,50,10,.6)';ctx.lineWidth=1.5;
+  // Eyebrows (arched smugly)
+  ctx.beginPath();ctx.arc(x+(dir>0?12:24),y+3+bob,4,Math.PI*1.1,Math.PI*1.9);ctx.stroke();
+  // Eyes
+  ctx.fillStyle=d.eye;
+  const eg2=ctx.createRadialGradient(x+(dir>0?13:23),y+7+bob,0,x+(dir>0?13:23),y+7+bob,5);
+  eg2.addColorStop(0,'rgba(255,230,30,.95)');eg2.addColorStop(.4,'rgba(200,160,10,.7)');eg2.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=eg2;ctx.beginPath();ctx.arc(x+(dir>0?13:23),y+7+bob,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#2a1a00';ctx.beginPath();ctx.arc(x+(dir>0?13:23),y+7+bob,2,0,Math.PI*2);ctx.fill();
+  // Smirk
+  ctx.strokeStyle='rgba(80,40,10,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();if(dir>0){ctx.arc(x+15,y+11+bob,4,0,Math.PI*.6);}
+  else{ctx.arc(x+21,y+11+bob,4,Math.PI*.4,Math.PI);}ctx.stroke();
+
+  // Crown - elaborate
+  ctx.fillStyle=hfl?'#ffe060':'#c89010';ctx.fillRect(x+8,y+bob,22,6);
+  ctx.fillStyle=hfl?'#ffe880':'#d8a818';
+  for(let i=0;i<7;i++){
+    const ck=x+9+i*3.2;
+    ctx.fillRect(ck,y-4+bob,3,i%2===0?10:7);
+  }
+  ctx.fillRect(x+8,y+2+bob,22,4);
+  // Crown jewels
+  const cj=['#ff3030','#40d0ff','#ff3030'];
+  cj.forEach((c,i)=>{
+    ctx.fillStyle=c;ctx.beginPath();ctx.arc(x+12+i*6.5,y+bob,2.2,0,Math.PI*2);ctx.fill();
+  });
+
+  // Vanity glow / golden aura
+  const ag=ctx.createRadialGradient(x+18,y+25+bob,0,x+18,y+25+bob,40);
+  ag.addColorStop(0,'rgba(220,170,15,.15)');ag.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=ag;ctx.beginPath();ctx.arc(x+18,y+25+bob,40,0,Math.PI*2);ctx.fill();
+}
+
+function shd(hex,pct){
+  const n=parseInt(hex.replace('#',''),16);
+  const r=cl(((n>>16)&255)+pct,0,255);
+  const g=cl(((n>>8)&255)+pct,0,255);
+  const b=cl((n&255)+pct,0,255);
+  return `rgb(${r},${g},${b})`;
+}
+
+// ═══════════════════════════════════════════════════
+// PLAYER DRAWING - master operative from Solomon's era
+// ═══════════════════════════════════════════════════
+function drawPlayer(){
+  const x=P.x,y=P.y;
+  const dir=P.fa;
+  const inv=P.inv>0&&Math.floor(P.inv/5)%2===0;
+  ctx.save();
+  if(inv)ctx.globalAlpha=.22;
+
+  // ── Ground shadow ──
+  ctx.fillStyle='rgba(0,0,0,.35)';
+  ctx.beginPath();ctx.ellipse(x+PW/2,y+PH+1,14,4,0,0,Math.PI*2);ctx.fill();
+
+  // ── Sandals - leather straps over linen wrappings ──
+  const sL=P.wf===0?0:4, sR=P.wf===0?4:0;
+  // Linen foot wrapping
+  ctx.fillStyle='#d0c8a0';
+  ctx.fillRect(x+3,y+PH-12+sL,10,10);
+  ctx.fillRect(x+PW-11,y+PH-12+sR,10,10);
+  // Leather sole
+  ctx.fillStyle='#5e3818';
+  ctx.fillRect(x+2,y+PH-6+sL,12,8);
+  ctx.fillRect(x+PW-12,y+PH-6+sR,12,8);
+  // Strap over foot
+  ctx.strokeStyle='#3a2010';ctx.lineWidth=1.5;
+  ctx.strokeRect(x+2,y+PH-12+sL,12,10);
+  ctx.strokeRect(x+PW-12,y+PH-12+sR,12,10);
+  // Cross strap
+  ctx.beginPath();ctx.moveTo(x+4,y+PH-6+sL);ctx.lineTo(x+12,y+PH-3+sL);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+PW-10,y+PH-6+sR);ctx.lineTo(x+PW-4,y+PH-3+sR);ctx.stroke();
+
+  // ── Legs - linen trousers ──
+  ctx.fillStyle='#d8d0a8';
+  ctx.fillRect(x+5,y+PH-24,8,16+sL);
+  ctx.fillRect(x+PW-11,y+PH-24,8,16+sR);
+  // Shadow on inner legs
+  ctx.fillStyle='rgba(0,0,0,.18)';
+  ctx.fillRect(x+11,y+PH-24,2,16);
+
+  // ── Main tunic - linen off-white, knee length ──
+  const tg=ctx.createLinearGradient(x+2,y+18,x+PW-2,y+PH-8);
+  tg.addColorStop(0,'#e0d8b8');tg.addColorStop(.5,'#d4cc9e');tg.addColorStop(1,'#c8c090');
+  ctx.fillStyle=tg;ctx.fillRect(x+2,y+18,PW-4,PH-30);
+  // Tunic folds (woven texture)
+  ctx.strokeStyle='rgba(160,140,80,.25)';ctx.lineWidth=1;
+  for(let tx2=x+5;tx2<x+PW-4;tx2+=5){
+    ctx.beginPath();ctx.moveTo(tx2,y+18);ctx.lineTo(tx2,y+PH-12);ctx.stroke();
+  }
+  // Hem border (gold embroidery)
+  ctx.strokeStyle='#c89018';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x+2,y+18);ctx.lineTo(x+PW-2,y+18);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+2,y+PH-10);ctx.lineTo(x+PW-2,y+PH-10);ctx.stroke();
+  // Gold geometric pattern on hem (zigzag)
+  ctx.strokeStyle='rgba(200,148,20,.55)';ctx.lineWidth=1;
+  ctx.beginPath();
+  for(let bx=x+4;bx<x+PW-5;bx+=6){
+    ctx.moveTo(bx,y+PH-10);ctx.lineTo(bx+3,y+PH-7);ctx.lineTo(bx+6,y+PH-10);
+  }
+  ctx.stroke();
+
+  // ── Leather belt ──
+  ctx.fillStyle='#3e2208';ctx.fillRect(x+2,y+33,PW-4,7);
+  // Belt highlight
+  ctx.fillStyle='rgba(80,45,15,.4)';ctx.fillRect(x+2,y+33,PW-4,3);
+  // Bronze buckle
+  ctx.fillStyle='#c87020';ctx.fillRect(x+PW/2-5,y+33,10,7);
+  ctx.fillStyle='#e09030';ctx.fillRect(x+PW/2-3,y+35,6,4);
+  ctx.strokeStyle='#8a4e10';ctx.lineWidth=1;ctx.strokeRect(x+PW/2-5,y+33,10,7);
+  // Hanging tool loop
+  ctx.fillStyle='#5a3010';ctx.fillRect(x+(dir>0?PW-5:2),y+36,3,8);
+
+  // ── Leather apron (symbolic, with incised geometry) ──
+  const ag2=ctx.createLinearGradient(x+5,y+22,x+PW-5,y+38);
+  ag2.addColorStop(0,'#c8a060');ag2.addColorStop(.5,'#b89050');ag2.addColorStop(1,'#a07840');
+  ctx.fillStyle=ag2;
+  ctx.beginPath();ctx.moveTo(x+5,y+22);ctx.lineTo(x+PW-5,y+22);
+  ctx.lineTo(x+PW-3,y+38);ctx.lineTo(x+3,y+38);ctx.closePath();ctx.fill();
+  // Apron border
+  ctx.strokeStyle='#7a4e18';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x+5,y+22);ctx.lineTo(x+PW-5,y+22);
+  ctx.lineTo(x+PW-3,y+38);ctx.lineTo(x+3,y+38);ctx.closePath();ctx.stroke();
+  // Apron geometric device (triangle + square, no sigils)
+  ctx.strokeStyle='rgba(60,35,8,.65)';ctx.lineWidth=1;
+  // Square outline
+  ctx.strokeRect(x+8,y+24,16,12);
+  // Triangle inside
+  ctx.beginPath();ctx.moveTo(x+16,y+24);ctx.lineTo(x+22,y+35);ctx.lineTo(x+10,y+35);ctx.closePath();ctx.stroke();
+  // Dot center
+  ctx.fillStyle='rgba(70,40,10,.5)';ctx.beginPath();ctx.arc(x+16,y+30,1.5,0,Math.PI*2);ctx.fill();
+
+  // ── Back arm ──
+  ctx.fillStyle='#c8a070';
+  const bArmX=x+(dir>0?3:PW-11);
+  const bArmSwing=P.atk?(dir*-22):Math.sin(gt*.16)*7;
+  ctx.save();ctx.translate(bArmX+4,y+22);ctx.rotate(bArmSwing*Math.PI/180);
+  ctx.fillRect(-4,0,8,20);
+  // Back hand
+  ctx.fillStyle='#b89060';ctx.beginPath();ctx.arc(0,21,4,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  // ── Front arm + MALHETE ──
+  const fArmX=x+(dir>0?PW-11:3);
+  const fArmSwing=P.atk?(dir*30):(-Math.sin(gt*.16)*7);
+  ctx.save();ctx.translate(fArmX+4,y+22);ctx.rotate(fArmSwing*Math.PI/180);
+  ctx.fillStyle='#c8a070';ctx.fillRect(-4,0,8,20);
+  ctx.fillStyle='#b89060';ctx.beginPath();ctx.arc(0,21,4,0,Math.PI*2);ctx.fill();
+
+  if(!P.atk){
+    // Malhete in hand at rest
+    ctx.fillStyle='#7a5028';ctx.fillRect(-2,16,4,18); // handle
+    ctx.fillStyle='#a08840';ctx.fillRect(-7,12,14,8); // stone head
+    // Stone texture
+    ctx.fillStyle='rgba(80,60,15,.4)';ctx.fillRect(-5,13,5,6);
+    ctx.strokeStyle='#604810';ctx.lineWidth=1.2;ctx.strokeRect(-7,12,14,8);
+    // Metal band
+    ctx.strokeStyle='#808060';ctx.lineWidth=1;ctx.strokeRect(-6,16,12,2);
+  } else {
+    // Swinging malhete
+    const swAng=P.at>10?-50:15;
+    ctx.save();ctx.translate(dir*12,18);ctx.rotate(swAng*Math.PI/180);
+    ctx.fillStyle='#7a5028';ctx.fillRect(-2,-4,4,22);
+    ctx.fillStyle='#a08840';ctx.fillRect(-8,-10,16,9);
+    ctx.fillStyle='rgba(80,60,15,.4)';ctx.fillRect(-6,-9,6,7);
+    ctx.strokeStyle='#604810';ctx.lineWidth=1.5;ctx.strokeRect(-8,-10,16,9);
+    ctx.strokeStyle='#808060';ctx.lineWidth=1;ctx.strokeRect(-7,-5,14,2);
+    ctx.restore();
+  }
+  ctx.restore();
+
+  // ── Head ──
+  // Neck
+  ctx.fillStyle='#c8a060';ctx.fillRect(x+PW/2-4,y+12,8,12);
+  // Head shape - slightly angular, masculine
+  ctx.fillStyle='#d4a868';ctx.beginPath();ctx.arc(x+PW/2,y+8,11,0,Math.PI*2);ctx.fill();
+  // Forehead shadow (darker top)
+  ctx.fillStyle='rgba(0,0,0,.15)';ctx.beginPath();ctx.arc(x+PW/2,y+5,9,Math.PI*.7,Math.PI*2.3);ctx.closePath();ctx.fill();
+  // Facial structure
+  // Cheekbone
+  ctx.fillStyle='rgba(200,150,80,.25)';ctx.beginPath();ctx.arc(x+PW/2+dir*5,y+10,5,0,Math.PI*2);ctx.fill();
+  // Nose
+  ctx.fillStyle='#b88858';ctx.fillRect(x+PW/2+dir*1-1,y+9,2,4);
+  // Mouth / lips
+  ctx.strokeStyle='#8a5828';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(x+PW/2-3,y+13);ctx.lineTo(x+PW/2+3,y+13);ctx.stroke();
+  // Eye - detailed
+  ctx.fillStyle='#f0e8c0';ctx.beginPath();ctx.arc(x+PW/2+dir*4,y+8,3.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#3a2010';ctx.beginPath();ctx.arc(x+PW/2+dir*4.2,y+8,2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.beginPath();ctx.arc(x+PW/2+dir*3,y+6.5,1.2,0,Math.PI*2);ctx.fill();
+  // Brow
+  ctx.strokeStyle='#5a3818';ctx.lineWidth=1.8;
+  ctx.beginPath();ctx.moveTo(x+PW/2+dir*1,y+4.5);ctx.lineTo(x+PW/2+dir*7.5,y+4);ctx.stroke();
+  // Beard - thick, well-kept
+  ctx.fillStyle='#5a3e18';
+  ctx.beginPath();ctx.arc(x+PW/2,y+14,8,0,Math.PI);ctx.fill();
+  ctx.fillStyle='#4a2e10';ctx.beginPath();ctx.arc(x+PW/2,y+15,6,0,Math.PI*.9);ctx.fill();
+  // Beard strands
+  ctx.strokeStyle='#3a2408';ctx.lineWidth=1;
+  for(let s=0;s<6;s++){
+    const sx=x+PW/2-7+s*3;
+    ctx.beginPath();ctx.moveTo(sx,y+13);
+    ctx.bezierCurveTo(sx-1,y+17,sx+1,y+19,sx,y+21);
+    ctx.stroke();
+  }
+
+  // ── Linen headwrap / turban ──
+  const hwg=ctx.createLinearGradient(x+PW/2-10,y-2,x+PW/2+10,y+5);
+  hwg.addColorStop(0,'#ede8c8');hwg.addColorStop(1,'#d8d0a8');
+  ctx.fillStyle=hwg;
+  ctx.beginPath();ctx.arc(x+PW/2,y+4,11,Math.PI,0);ctx.lineTo(x+PW/2+11,y+5);ctx.lineTo(x+PW/2-11,y+5);ctx.closePath();ctx.fill();
+  // Headwrap layers
+  ctx.fillStyle='rgba(220,200,140,.4)';ctx.fillRect(x+PW/2-10,y+2,20,4);
+  // Crimson stripe (distinction mark)
+  ctx.fillStyle='rgba(160,25,25,.7)';ctx.fillRect(x+PW/2-10,y+3,20,2);
+  // Wrap end hanging
+  ctx.fillStyle='#d8d0a8';
+  if(dir>0) ctx.fillRect(x+PW/2+6,y+4,5,10);
+  else ctx.fillRect(x+PW/2-11,y+4,5,10);
+
+  // ── Special burst aura ──
+  if(P.sact&&P.st>0){
+    const sa=P.st/40;
+    ctx.strokeStyle=`rgba(220,175,55,${sa})`;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x+PW/2,y+PH/2,62*(1-sa*.4),0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle=`rgba(255,220,80,${sa*.6})`;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(x+PW/2,y+PH/2,40*(1-sa*.3),0,Math.PI*2);ctx.stroke();
+    // Orbiting dots
+    for(let i=0;i<6;i++){
+      const a=(i/6)*Math.PI*2+gt*.1;
+      ctx.fillStyle=`rgba(240,200,70,${sa*.8})`;
+      ctx.beginPath();ctx.arc(x+PW/2+Math.cos(a)*55,y+PH/2+Math.sin(a)*55,3,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  ctx.restore();
+}
+
+// ── Attack FX ──
+function drawAtkFX(){
+  const a=atkHB,dir=P.fa;
+  const alpha=a.t/16;
+  // Main arc
+  ctx.strokeStyle=`rgba(255,215,50,${alpha})`;ctx.lineWidth=4;
+  ctx.beginPath();ctx.arc(P.x+PW/2+dir*20,P.y+24,40,-Math.PI*.35+dir*Math.PI*.5,Math.PI*.35+dir*Math.PI*.5);ctx.stroke();
+  // Inner arc
+  ctx.strokeStyle=`rgba(255,255,160,${alpha*.7})`;ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(P.x+PW/2+dir*20,P.y+24,28,-Math.PI*.22+dir*Math.PI*.5,Math.PI*.22+dir*Math.PI*.5);ctx.stroke();
+  // Impact sparks
+  const ix=P.x+(dir>0?PW+45:-40),iy=P.y+24;
+  for(let i=0;i<4;i++){
+    const sa=dir*Math.PI*.5+(rn(-1,1)*.8);
+    ctx.strokeStyle=`rgba(255,230,80,${alpha*.6})`;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(P.x+PW/2+dir*55,P.y+24);
+    ctx.lineTo(P.x+PW/2+dir*55+Math.cos(sa)*15,P.y+24+Math.sin(sa)*15);ctx.stroke();
+  }
+}
+
+// ── Particles ──
+function drawParts(){
+  parts.forEach(p=>{
+    const a=p.l/p.ml;
+    ctx.globalAlpha=a;ctx.fillStyle=p.color;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.sz*Math.sqrt(a),0,Math.PI*2);ctx.fill();
+  });
+  ctx.globalAlpha=1;
+}
+
+// ═══════════════════════════════════════════════════
+// HUD - Symphony of the Night inspired
+// ═══════════════════════════════════════════════════
+function drawHUD(){
+  // Panel
+  ctx.fillStyle='rgba(3,2,8,.9)';ctx.fillRect(0,0,W,58);
+  ctx.strokeStyle='rgba(80,58,18,.55)';ctx.lineWidth=1;ctx.strokeRect(0,58,W,1);
+
+  // HP orbs
+  const hpX=14,hpY=14,hpW=180,hpH=16;
+  ctx.fillStyle='rgba(212,160,55,.65)';ctx.font='11px Georgia,serif';ctx.textAlign='left';
+  ctx.fillText('HP',hpX,hpY+12);
+  ctx.fillStyle='#1a0404';ctx.fillRect(hpX+24,hpY,hpW,hpH);
+  const hpR=P.hp/P.mhp;
+  const hpG=ctx.createLinearGradient(hpX+24,0,hpX+24+hpW,0);
+  hpG.addColorStop(0,'#c01818');hpG.addColorStop(.45,'#ee3030');hpG.addColorStop(1,'#dd1c1c');
+  ctx.fillStyle=hpG;ctx.fillRect(hpX+24,hpY,hpW*hpR,hpH);
+  ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(hpX+24,hpY,hpW*hpR,6);
+  ctx.strokeStyle='#401010';ctx.lineWidth=1;ctx.strokeRect(hpX+24,hpY,hpW,hpH);
+  ctx.fillStyle='rgba(220,175,115,.75)';ctx.font='9px Georgia,serif';
+  ctx.fillText(`${P.hp}/${P.mhp}`,hpX+24+hpW+7,hpY+12);
+
+  // Center
+  ctx.fillStyle='#f2d468';ctx.font='bold 15px Palatino Linotype,Palatino,serif';ctx.textAlign='center';
+  ctx.fillText('APRENDIZ',W/2,21);
+  ctx.strokeStyle='rgba(212,168,67,.28)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W/2-60,26);ctx.lineTo(W/2+60,26);ctx.stroke();
+  const sec=Math.floor(cam.x/1000);
+  const secN=['Câmara de Reflexão','Corredor das Sombras','Câmara do Esquadro','Portal da Luz'];
+  ctx.fillStyle='rgba(180,140,58,.6)';ctx.font='9px Georgia,serif';
+  ctx.fillText(secN[Math.min(sec,3)],W/2,42);
+  // Ornaments
+  ctx.fillStyle='rgba(80,55,18,.6)';ctx.font='11px serif';
+  ctx.fillText('◆',W/2-72,27);ctx.fillText('◆',W/2+72,27);
+
+  // Right
+  ctx.textAlign='right';
+  ctx.fillStyle='#f2d468';ctx.font='11px Georgia,serif';
+  ctx.fillText(`SABEDORIA  ${wis}`,W-14,20);
+  const spRdy=P.scd===0&&P.items.length>0;
+  ctx.fillStyle=spRdy?'rgba(212,168,67,.85)':'rgba(75,56,18,.5)';ctx.font='9px Georgia,serif';
+  ctx.fillText(spRdy?'K: ESPECIAL ✦':`K: ${Math.ceil(P.scd/60)}s`,W-14,36);
+  if(P.rR){
+    ctx.fillStyle=P.rev?'rgba(100,180,255,.85)':'rgba(80,140,200,.5)';
+    ctx.fillText(P.rev?`R: ${Math.ceil(P.rt/60)}s`:'R: Revelar',W-14,50);
+  }
+
+  // Inventory
+  const ivX=228,tools=['régua','compasso','esquadro','malhete','avental'];
+  const tsym={régua:'▬',compasso:'◎',esquadro:'⊾',malhete:'⬡',avental:'◇'};
+  const tcol={régua:'#ede8c8',compasso:'#90b8e8',esquadro:'#98d898',malhete:'#f0c878',avental:'#f0a0b8'};
+  ctx.fillStyle='rgba(180,140,58,.38)';ctx.font='7.5px Georgia,serif';ctx.textAlign='left';
+  ctx.fillText('FERRAMENTAS',ivX,12);
+  tools.forEach((t,i)=>{
+    const has=P.items.includes(t);
+    const bx=ivX+i*38,by=14,bs=34;
+    ctx.fillStyle=has?'rgba(24,18,7,.92)':'rgba(8,6,3,.92)';ctx.fillRect(bx,by,bs,bs);
+    ctx.strokeStyle=has?'rgba(212,168,67,.82)':'rgba(48,36,13,.5)';ctx.lineWidth=1;ctx.strokeRect(bx,by,bs,bs);
+    // Inner glow on collected
+    if(has){ctx.fillStyle='rgba(212,168,67,.08)';ctx.fillRect(bx+1,by+1,bs-2,bs-2);}
+    ctx.font=`${has?19:14}px serif`;ctx.textAlign='center';
+    ctx.fillStyle=has?tcol[t]:'rgba(65,50,18,.4)';
+    ctx.fillText(tsym[t],bx+bs/2,by+bs/2+7);
+  });
+}
+
+// ── Message ──
+function drawMsg(){
+  if(mtm<=0)return;
+  const fade=mtm<50?mtm/50:1;
+  ctx.save();ctx.globalAlpha=fade;
+  const mw=620,mh=42,mx=(W-mw)/2,my=H-96;
+  ctx.fillStyle='rgba(3,2,8,.93)';ctx.fillRect(mx,my,mw,mh);
+  ctx.strokeStyle='rgba(212,168,67,.48)';ctx.lineWidth=1;ctx.strokeRect(mx,my,mw,mh);
+  // decorative side bars
+  ctx.fillStyle='rgba(212,168,67,.45)';ctx.fillRect(mx,my,3,mh);ctx.fillRect(mx+mw-3,my,3,mh);
+  ctx.fillStyle='rgba(212,168,67,.4)';ctx.font='13px serif';
+  ctx.textAlign='left';ctx.fillText('◆',mx+8,my+27);
+  ctx.textAlign='right';ctx.fillText('◆',mx+mw-8,my+27);
+  ctx.fillStyle='#f2d468';ctx.font='italic 13.5px Palatino Linotype,Palatino,serif';ctx.textAlign='center';
+  ctx.fillText(mt,W/2,my+27);
+  ctx.restore();
+}
+
+// Prebake backgrounds on load
+prebakeBackgrounds();
+</script>
+</body>
+</html>
